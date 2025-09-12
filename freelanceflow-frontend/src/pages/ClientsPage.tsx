@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import useClientStore, { Client } from "@/store/clientStore";
 import ClientForm from "@/components/clients/ClientForm";
+import GenerateInvoiceDialog from "@/components/invoices/GenerateInvoiceDialog";
 import * as z from "zod";
 
 const formSchema = z.object({
@@ -38,6 +39,7 @@ const ClientsPage = () => {
   const { clients, addClient, updateClient, deleteClient } = useClientStore();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [invoicingClient, setInvoicingClient] = useState<Client | null>(null);
 
   const handleOpenFormDialog = (client: Client | null) => {
     setEditingClient(client);
@@ -78,6 +80,14 @@ const ClientsPage = () => {
         </DialogContent>
       </Dialog>
 
+      {invoicingClient && (
+        <GenerateInvoiceDialog
+          client={invoicingClient}
+          isOpen={!!invoicingClient}
+          onClose={() => setInvoicingClient(null)}
+        />
+      )}
+
       <div className="border rounded-lg">
         <Table>
           <TableHeader>
@@ -93,6 +103,9 @@ const ClientsPage = () => {
                 <TableCell>{client.name}</TableCell>
                 <TableCell>{client.email}</TableCell>
                 <TableCell className="text-right">
+                  <Button variant="outline" size="sm" className="mr-2" onClick={() => setInvoicingClient(client)}>
+                    Generate Invoice
+                  </Button>
                   <Button variant="outline" size="sm" className="mr-2" onClick={() => handleOpenFormDialog(client)}>Edit</Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
