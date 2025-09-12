@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '../ui/checkbox';
 import { Label } from '@/components/ui/label';
 import useProjectStore from '@/store/projectStore';
 import useInvoiceStore from '@/store/invoiceStore';
