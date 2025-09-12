@@ -27,6 +27,9 @@ import { Button } from "@/components/ui/button";
 import useInvoiceStore, { Invoice } from "@/store/invoiceStore";
 import useClientStore from "@/store/clientStore";
 import { Badge } from "@/components/ui/badge";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import InvoicePDF from "@/components/invoices/InvoicePDF";
+import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
 const InvoicesPage = () => {
   const { invoices, updateInvoiceStatus, deleteInvoice } = useInvoiceStore();
@@ -93,6 +96,16 @@ const InvoicesPage = () => {
                       <DropdownMenuItem onClick={() => handleStatusChange(invoice.id, 'paid')}>
                         Mark as Paid
                       </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <PDFDownloadLink
+                          document={<InvoicePDF invoice={invoice} />}
+                          fileName={`invoice-${invoice.id}.pdf`}
+                          className="w-full h-full px-2 py-1.5 text-sm"
+                        >
+                          {({ loading }) => (loading ? 'Loading...' : 'Download PDF')}
+                        </PDFDownloadLink>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
                       <DropdownMenuItem>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
