@@ -1,0 +1,93 @@
+import { create } from 'zustand';
+import { v4 as uuidv4 } from 'uuid';
+import useClientStore from './clientStore';
+
+export interface Task {
+  id: string;
+  description: string;
+  hours: number;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  clientId: string;
+  tasks: Task[];
+}
+
+interface ProjectState {
+  projects: Project[];
+  addProject: (project: Omit<Project, 'id' | 'tasks'>) => void;
+  updateProject: (project: Project) => void;
+  deleteProject: (id: string) => void;
+  addTask: (projectId: string, task: Omit<Task, 'id'>) => void;
+  updateTask: (projectId: string, task: Task) => void;
+  deleteTask: (projectId: string, taskId: string) => void;
+}
+
+// Get the initial clients from the clientStore
+const initialClients = useClientStore.getState().clients;
+
+const useProjectStore = create<ProjectState>((set) => ({
+  projects: [
+    // Some initial dummy data linked to actual clients
+    {
+      id: uuidv4(),
+      name: 'Website Redesign',
+      description: 'A complete overhaul of the main website.',
+      clientId: initialClients.length > 0 ? initialClients[0].id : '',
+      tasks: [
+        { id: uuidv4(), description: 'Design mockups', hours: 20 },
+        { id: uuidv4(), description: 'Develop homepage', hours: 35 },
+      ]
+    },
+    {
+      id: uuidv4(),
+      name: 'Mobile App Development',
+      description: 'A new mobile app for iOS and Android.',
+      clientId: initialClients.length > 1 ? initialClients[1].id : '',
+      tasks: []
+    },
+  ],
+  addProject: (project) =>
+    set((state) => ({
+      projects: [...state.projects, { ...project, id: uuidv4(), tasks: [] }],
+    })),
+  updateProject: (updatedProject) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === updatedProject.id ? { ...project, ...updatedProject } : project
+      ),
+    })),
+  deleteProject: (id) =>
+    set((state) => ({
+      projects: state.projects.filter((project) => project.id !== id),
+    })),
+  addTask: (projectId, task) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, tasks: [...project.tasks, { ...task, id: uuidv4() }] }
+          : project
+      ),
+    })),
+  updateTask: (projectId, updatedTask) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, tasks: project.tasks.map(task => task.id === updatedTask.id ? updatedTask : task) }
+          : project
+      ),
+    })),
+  deleteTask: (projectId, taskId) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, tasks: project.tasks.filter((task) => task.id !== taskId) }
+          : project
+      ),
+    })),
+}));
+
+export default useProjectStore;
