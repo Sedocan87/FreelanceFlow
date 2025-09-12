@@ -3,28 +3,36 @@
 import * as React from "react"
 import * as LabelPrimitive from "@radix-ui/react-label"
 import { Slot } from "@radix-ui/react-slot"
-import { Controller, useFormContext } from "react-hook-form"
-import type { ControllerProps, FieldPath, FieldValues } from "react-hook-form"
+import { Controller, useFormContext, FormProvider } from "react-hook-form"
+import type { ControllerProps, FieldPath, FieldValues, UseFormReturn } from "react-hook-form"
 
 import { cn } from "@/lib/utils"
 import { Label } from "@/components/ui/label"
 
-const Form = React.forwardRef<
-  HTMLFormElement,
-  React.HTMLAttributes<HTMLFormElement> & {
-    onSubmit: () => void;
-  }
->(({ onSubmit, children, className, ...props }, ref) => (
-  <form
-    ref={ref}
-    onSubmit={onSubmit}
-    className={cn("space-y-8", className)}
-    {...props}
-  >
-    {children}
-  </form>
-))
-Form.displayName = "Form"
+const Form = <TFieldValues extends FieldValues = FieldValues>({
+  form,
+  onSubmit,
+  children,
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLFormElement> & {
+  form: UseFormReturn<TFieldValues>;
+  onSubmit: (values: TFieldValues) => void;
+}) => (
+  <FormProvider {...form}>
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className={cn("space-y-8", className)}
+      {...props}
+    >
+      {children}
+    </form>
+  </FormProvider>
+);
+
+
+
+Form.displayName = "Form";
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -54,7 +62,17 @@ const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext)
   const itemContext = React.useContext(FormItemContext)
 
-  const { getFieldState, formState } = useFormContext()
+  const formContext = useFormContext()
+
+  if (!formContext) {
+    throw new Error("useFormField must be used within a FormProvider.");
+  }
+
+  const { getFieldState, formState } = formContext;
+
+  if (typeof getFieldState !== 'function') {
+    throw new Error("getFieldState is not a function. Ensure FormProvider is correctly set up with useForm methods.");
+  }
 
   const fieldState = getFieldState(fieldContext.name, formState)
 

@@ -1,9 +1,10 @@
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -72,8 +73,7 @@ const CompanySettingsPage = () => {
           <CardTitle>Company Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                    <Form form={form} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <div className="flex items-center space-x-4">
                 {settings.logo && (
                   <img
@@ -234,8 +234,7 @@ const CompanySettingsPage = () => {
               />
 
               <Button type="submit">Save Settings</Button>
-            </form>
-          </FormProvider>
+            </Form>
         </CardContent>
       </Card>
     </div>

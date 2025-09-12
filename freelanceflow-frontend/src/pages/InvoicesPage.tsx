@@ -79,97 +79,99 @@ const InvoicesPage = () => {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Invoices</h1>
-      </div>
+    <>
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Invoices</h1>
+        </div>
 
-      <div className="border rounded-lg">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Client</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell>{getClientName(invoice.clientId)}</TableCell>
-                <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
-                <TableCell>
-                  <Badge variant={invoice.status === 'paid' ? 'default' : 'secondary'}>
-                    {invoice.status}
-                  </Badge>
-                </TableCell>
-                <TableCell>{formatDate(invoice.createdAt)}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="sm">...</Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => handleOpenSendInvoiceDialog(invoice)}>
-                        Send Invoice
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusChange(invoice.id, 'sent')}>
-                        Mark as Sent
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleStatusChange(invoice.id, 'paid')}>
-                        Mark as Paid
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <PDFDownloadLink
-                          document={<InvoicePDF invoice={invoice} />}
-                          fileName={`invoice-${invoice.id}.pdf`}
-                          className="w-full h-full px-2 py-1.5 text-sm"
-                        >
-                          {({ loading }) => (loading ? 'Loading...' : 'Download PDF')}
-                        </PDFDownloadLink>
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <span className="w-full text-left">Delete</span>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will permanently delete the invoice.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction onClick={() => deleteInvoice(invoice.id)}>
-                                Continue
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Client</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {invoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell>{getClientName(invoice.clientId)}</TableCell>
+                  <TableCell>{formatCurrency(invoice.totalAmount)}</TableCell>
+                  <TableCell>
+                    <Badge variant={invoice.status === 'paid' ? 'default' : 'secondary'}>
+                      {invoice.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{formatDate(invoice.createdAt)}</TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">...</Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleOpenSendInvoiceDialog(invoice)}>
+                          Send Invoice
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(invoice.id, 'sent')}>
+                          Mark as Sent
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusChange(invoice.id, 'paid')}>
+                          Mark as Paid
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <PDFDownloadLink
+                            document={<InvoicePDF invoice={invoice} />}
+                            fileName={`invoice-${invoice.id}.pdf`}
+                            className="w-full h-full px-2 py-1.5 text-sm"
+                          >
+                            {({ loading }) => (loading ? 'Loading...' : 'Download PDF')}
+                          </PDFDownloadLink>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <span className="w-full text-left">Delete</span>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This will permanently delete the invoice.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => deleteInvoice(invoice.id)}>
+                                  Continue
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
-    </div>
 
-    {invoiceToSend && (
-      <SendInvoiceDialog
-        invoice={invoiceToSend}
-        isOpen={!!invoiceToSend}
-        onClose={() => setIsSendInvoiceDialogOpen(false)}
-        onSend={handleSendInvoice}
-      />
-    )}
+      {invoiceToSend && (
+        <SendInvoiceDialog
+          invoice={invoiceToSend}
+          isOpen={!!invoiceToSend}
+          onClose={() => setIsSendInvoiceDialogOpen(false)}
+          onSend={handleSendInvoice}
+        />
+      )}
+    </>
   );
 };
 

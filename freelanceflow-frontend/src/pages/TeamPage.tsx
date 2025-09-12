@@ -82,7 +82,7 @@ const TeamPage = () => {
           <DialogHeader>
             <DialogTitle>Invite Team Member</DialogTitle>
           </DialogHeader>
-          <Form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Form form={form} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
