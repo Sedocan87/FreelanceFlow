@@ -26,14 +26,18 @@ import {
 import { Button } from "@/components/ui/button";
 import useInvoiceStore, { type Invoice } from "@/store/invoiceStore";
 import useClientStore from "@/store/clientStore";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InvoicePDF from "@/components/invoices/InvoicePDF";
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import SendInvoiceDialog from "@/components/invoices/SendInvoiceDialog";
 
 const InvoicesPage = () => {
   const { invoices, updateInvoiceStatus, deleteInvoice } = useInvoiceStore();
   const { clients } = useClientStore();
+  const [isSendInvoiceDialogOpen, setIsSendInvoiceDialogOpen] = useState(false);
+  const [invoiceToSend, setInvoiceToSend] = useState<Invoice | null>(null);
 
   const getClientName = (clientId: string) => {
     const client = clients.find((c) => c.id === clientId);
@@ -54,6 +58,24 @@ const InvoicesPage = () => {
 
   const handleStatusChange = (invoiceId: string, status: Invoice['status']) => {
     updateInvoiceStatus(invoiceId, status);
+  };
+
+  const handleOpenSendInvoiceDialog = (invoice: Invoice) => {
+    setInvoiceToSend(invoice);
+    setIsSendInvoiceDialogOpen(true);
+  };
+
+  const handleSendInvoice = (recipientEmail: string, subject: string, message: string) => {
+    if (invoiceToSend) {
+      console.log(`Simulating sending invoice ${invoiceToSend.id} to ${recipientEmail}`);
+      console.log(`Subject: ${subject}`);
+      console.log(`Message: ${message}`);
+      // In a real application, you would make an API call to your backend here
+      // to send the invoice via email.
+      updateInvoiceStatus(invoiceToSend.id, 'sent'); // Update status to sent
+      setIsSendInvoiceDialogOpen(false);
+      setInvoiceToSend(null);
+    }
   };
 
   return (
@@ -90,6 +112,9 @@ const InvoicesPage = () => {
                       <Button variant="ghost" size="sm">...</Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => handleOpenSendInvoiceDialog(invoice)}>
+                        Send Invoice
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleStatusChange(invoice.id, 'sent')}>
                         Mark as Sent
                       </DropdownMenuItem>
@@ -136,6 +161,15 @@ const InvoicesPage = () => {
         </Table>
       </div>
     </div>
+
+    {invoiceToSend && (
+      <SendInvoiceDialog
+        invoice={invoiceToSend}
+        isOpen={!!invoiceToSend}
+        onClose={() => setIsSendInvoiceDialogOpen(false)}
+        onSend={handleSendInvoice}
+      />
+    )}
   );
 };
 

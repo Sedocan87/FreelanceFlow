@@ -9,12 +9,20 @@ export interface Task {
   completed: boolean;
 }
 
+export interface Expense {
+  id: string;
+  description: string;
+  amount: number;
+  date: Date;
+}
+
 export interface Project {
   id: string;
   name: string;
   description?: string;
   clientId: string;
   tasks: Task[];
+  expenses: Expense[]; // New property
   teamMembers?: string[]; // Array of team member IDs
   createdBy: string; // User ID of project creator
   lastModifiedBy: string; // User ID of last person to modify the project
@@ -29,6 +37,9 @@ interface ProjectState {
   addTask: (projectId: string, task: Omit<Task, 'id'>) => void;
   updateTask: (projectId: string, task: Task) => void;
   deleteTask: (projectId: string, taskId: string) => void;
+  addExpense: (projectId: string, expense: Omit<Expense, 'id'>) => void;
+  updateExpense: (projectId: string, expense: Expense) => void;
+  deleteExpense: (projectId: string, expenseId: string) => void;
 }
 
 // Get the initial clients from the clientStore
@@ -46,6 +57,7 @@ const useProjectStore = create<ProjectState>((set) => ({
         { id: uuidv4(), description: 'Design mockups', hours: 20, completed: true },
         { id: uuidv4(), description: 'Develop homepage', hours: 35, completed: false },
       ],
+      expenses: [],
       teamMembers: [],
       createdBy: 'system',
       lastModifiedBy: 'system',
@@ -57,6 +69,7 @@ const useProjectStore = create<ProjectState>((set) => ({
       description: 'A new mobile app for iOS and Android.',
       clientId: initialClients.length > 1 ? initialClients[1].id : '',
       tasks: [],
+      expenses: [],
       teamMembers: [],
       createdBy: 'system',
       lastModifiedBy: 'system',
@@ -98,6 +111,30 @@ const useProjectStore = create<ProjectState>((set) => ({
       projects: state.projects.map((project) =>
         project.id === projectId
           ? { ...project, tasks: project.tasks.filter((task) => task.id !== taskId) }
+          : project
+      ),
+    })),
+  addExpense: (projectId, expense) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, expenses: [...project.expenses, { ...expense, id: uuidv4() }] }
+          : project
+      ),
+    })),
+  updateExpense: (projectId, updatedExpense) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, expenses: project.expenses.map(exp => exp.id === updatedExpense.id ? updatedExpense : exp) }
+          : project
+      ),
+    })),
+  deleteExpense: (projectId, expenseId) =>
+    set((state) => ({
+      projects: state.projects.map((project) =>
+        project.id === projectId
+          ? { ...project, expenses: project.expenses.filter((exp) => exp.id !== expenseId) }
           : project
       ),
     })),

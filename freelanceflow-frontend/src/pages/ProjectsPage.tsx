@@ -30,18 +30,22 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import useProjectStore, { type Project } from "@/store/projectStore";
+import useProjectStore, { type Project, type Expense } from "@/store/projectStore";
 import ProjectForm, { formSchema } from "@/components/projects/ProjectForm";
 import useClientStore from "@/store/clientStore";
 import * as z from "zod";
 import { ChevronRight } from "lucide-react";
 import TaskList from "@/components/projects/TaskList";
+import ExpenseForm from "@/components/projects/ExpenseForm";
+import { expenseFormSchema } from "@/components/projects/expense-form-schema";
 
 const ProjectsPage = () => {
-  const { projects, addProject, updateProject, deleteProject } = useProjectStore();
+  const { projects, addProject, updateProject, deleteProject, addExpense, updateExpense } = useProjectStore();
   const { clients } = useClientStore();
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const handleOpenFormDialog = (project: Project | null) => {
     setEditingProject(project);
@@ -51,6 +55,27 @@ const ProjectsPage = () => {
   const handleCloseFormDialog = () => {
     setEditingProject(null);
     setIsFormDialogOpen(false);
+  };
+
+  const handleOpenExpenseForm = (expense: Expense | null) => {
+    setEditingExpense(expense);
+    setIsExpenseFormOpen(true);
+  };
+
+  const handleCloseExpenseForm = () => {
+    setEditingExpense(null);
+    setIsExpenseFormOpen(false);
+  };
+
+  const handleExpenseSubmit = (values: z.infer<typeof expenseFormSchema>) => {
+    if (editingProject) {
+      if (editingExpense) {
+        updateExpense(editingProject.id, { ...editingExpense, ...values, date: new Date(values.date) });
+      } else {
+        addExpense(editingProject.id, { ...values, date: new Date(values.date) });
+      }
+    }
+    handleCloseExpenseForm();
   };
 
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
@@ -84,6 +109,15 @@ const ProjectsPage = () => {
             <DialogTitle>{editingProject ? "Edit Project" : "Create a new project"}</DialogTitle>
           </DialogHeader>
           <ProjectForm onSubmit={handleSubmit} initialData={editingProject || undefined} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isExpenseFormOpen} onOpenChange={setIsExpenseFormOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingExpense ? "Edit Expense" : "Add a new expense"}</DialogTitle>
+          </DialogHeader>
+          <ExpenseForm onSubmit={handleExpenseSubmit} initialData={editingExpense || undefined} />
         </DialogContent>
       </Dialog>
 
@@ -140,7 +174,13 @@ const ProjectsPage = () => {
                   <CollapsibleContent asChild>
                     <TableRow>
                       <TableCell colSpan={5}>
-                        <TaskList project={project} />
+                        <div className="space-y-4">
+                          <TaskList project={project} />
+                          <div className="flex justify-end">
+                            <Button size="sm" onClick={() => handleOpenExpenseForm(null)}>Add Expense</Button>
+                          </div>
+                          <ExpenseList project={project} />
+                        </div>
                       </TableCell>
                     </TableRow>
                   </CollapsibleContent>

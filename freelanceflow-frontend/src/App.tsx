@@ -11,6 +11,7 @@ import ReportsPage from './pages/ReportsPage';
 import TeamPage from './pages/TeamPage';
 import CompanySettingsPage from './pages/CompanySettingsPage';
 import BillingPage from './pages/BillingPage';
+import AutomationsPage from './pages/AutomationsPage';
 
 const App = () => {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

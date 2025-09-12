@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -36,6 +36,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { useTeamStore, type Role } from '@/store/teamStore';
 import useProjectStore from '@/store/projectStore';
+import useAuthStore from '@/store/authStore';
 
 const inviteFormSchema = z.object({
   email: z.string().email(),
@@ -45,6 +46,7 @@ const inviteFormSchema = z.object({
 const TeamPage = () => {
   const { members, invites, sendInvite, removeInvite, updateMember, removeMember } = useTeamStore();
   const { projects } = useProjectStore();
+  const { user } = useAuthStore();
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   const form = useForm<z.infer<typeof inviteFormSchema>>({
@@ -69,7 +71,10 @@ const TeamPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">Team Management</h1>
-        <Button onClick={() => setIsInviteDialogOpen(true)}>Invite Member</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => console.log('Simulating view activity')}>View Activity</Button>
+          <Button onClick={() => setIsInviteDialogOpen(true)}>Invite Member</Button>
+        </div>
       </div>
 
       <Dialog open={isInviteDialogOpen} onOpenChange={setIsInviteDialogOpen}>
@@ -209,6 +214,19 @@ const TeamPage = () => {
                   ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        )}
+
+        {user?.role === 'admin' && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Admin Actions</CardTitle>
+              <CardDescription>Actions only available to administrators.</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-wrap gap-2">
+              <Button variant="outline" onClick={() => console.log('Simulating global role management')}>Manage Roles Globally</Button>
+              <Button variant="outline" onClick={() => console.log('Simulating audit log view')}>View Audit Log</Button>
             </CardContent>
           </Card>
         )}

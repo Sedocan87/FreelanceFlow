@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 
 import { useSubscriptionStore } from '@/store/subscriptionStore';
+import { loadStripe } from '@stripe/stripe-js';
 
-// const stripePromise = loadStripe('your_publishable_key');
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq542VcIEFy7o');
 
 const plans = [
   {
@@ -49,29 +50,14 @@ const BillingPage = () => {
   const handleSubscribe = async (planTier: string) => {
     setIsLoading(true);
     try {
-      // In a real application, you would:
-      // 1. Call your backend to create a Stripe Checkout Session
-      // 2. Redirect to Stripe Checkout
-      // 3. Handle the success/cancel redirects
       console.log('Subscribing to', planTier);
-      
-      // Example of what the real implementation would look like:
-      /*
+
       const stripe = await stripePromise;
-      const response = await fetch('/api/create-checkout-session', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          planTier,
-        }),
-      });
-      const session = await response.json();
+      const session = { id: 'cs_test_12345' }; // Dummy session ID
+
       await stripe?.redirectToCheckout({
         sessionId: session.id,
       });
-      */
     } catch (error) {
       console.error('Error:', error);
     } finally {
