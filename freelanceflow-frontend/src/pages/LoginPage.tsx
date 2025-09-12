@@ -39,8 +39,7 @@ const LoginPage = () => {
           <CardDescription>Welcome back! Please login to your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <Form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -68,7 +67,6 @@ const LoginPage = () => {
                 )}
               />
               <Button type="submit" className="w-full">Login</Button>
-            </form>
           </Form>
           <div className="mt-4 text-center text-sm">
             Don't have an account?{" "}

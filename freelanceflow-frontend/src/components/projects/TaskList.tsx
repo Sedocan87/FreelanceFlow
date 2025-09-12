@@ -25,14 +25,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import useProjectStore, { Project, Task } from '@/store/projectStore';
-import TaskForm from './TaskForm';
+import useProjectStore, { type Project, type Task } from '@/store/projectStore';
+import { formSchema } from "./task-form-schema";
+import TaskForm from "./TaskForm";
+import Stopwatch from './Stopwatch';
 import * as z from 'zod';
-
-const formSchema = z.object({
-  description: z.string().min(2, { message: "Description must be at least 2 characters." }),
-  hours: z.coerce.number().min(0, { message: "Hours must be a positive number." }),
-});
 
 interface TaskListProps {
   project: Project;
@@ -57,7 +54,7 @@ const TaskList = ({ project }: TaskListProps) => {
     if (editingTask) {
       updateTask(project.id, { ...editingTask, ...values });
     } else {
-      addTask(project.id, values);
+      addTask(project.id, { ...values, completed: false });
     }
     handleCloseForm();
   };
@@ -83,6 +80,7 @@ const TaskList = ({ project }: TaskListProps) => {
           <TableHeader>
             <TableRow>
               <TableHead>Description</TableHead>
+              <TableHead className="w-[200px]">Timer</TableHead>
               <TableHead className="w-[100px] text-right">Hours</TableHead>
               <TableHead className="w-[160px] text-right">Actions</TableHead>
             </TableRow>
@@ -92,7 +90,19 @@ const TaskList = ({ project }: TaskListProps) => {
               project.tasks.map((task) => (
                 <TableRow key={task.id}>
                   <TableCell>{task.description}</TableCell>
-                  <TableCell className="text-right">{task.hours}</TableCell>
+                  <TableCell>
+                    <Stopwatch
+                      projectId={project.id}
+                      taskId={task.id}
+                      onTimeUpdate={(hours) => {
+                        updateTask(project.id, {
+                          ...task,
+                          hours: task.hours + hours,
+                        });
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell className="text-right">{task.hours.toFixed(2)}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="outline" size="sm" className="mr-2" onClick={() => handleOpenForm(task)}>Edit</Button>
                     <AlertDialog>

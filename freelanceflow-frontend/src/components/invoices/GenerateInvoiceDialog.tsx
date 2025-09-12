@@ -12,7 +12,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import useProjectStore from '@/store/projectStore';
 import useInvoiceStore from '@/store/invoiceStore';
-import { Client } from '@/store/clientStore';
+import { type Client } from '@/store/clientStore';
 
 interface GenerateInvoiceDialogProps {
   client: Client;

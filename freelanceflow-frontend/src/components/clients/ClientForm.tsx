@@ -11,12 +11,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Client } from "@/store/clientStore";
+import { type Client } from "@/store/clientStore";
 
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-});
+import { formSchema } from "./client-form-schema";
 
 interface ClientFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
@@ -30,8 +27,7 @@ const ClientForm = ({ onSubmit, initialData }: ClientFormProps) => {
   });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -59,7 +55,6 @@ const ClientForm = ({ onSubmit, initialData }: ClientFormProps) => {
           )}
         />
         <Button type="submit">Save</Button>
-      </form>
     </Form>
   );
 };

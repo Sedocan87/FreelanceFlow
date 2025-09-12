@@ -9,6 +9,8 @@ export interface Invoice {
   totalAmount: number;
   status: 'draft' | 'sent' | 'paid';
   createdAt: Date;
+  dueDate: Date;
+  paid: boolean;
 }
 
 interface InvoiceState {
@@ -36,6 +38,8 @@ const useInvoiceStore = create<InvoiceState>((set, get) => ({
       totalAmount,
       status: 'draft',
       createdAt: new Date(),
+      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      paid: false
     };
 
     set({ invoices: [...get().invoices, newInvoice] });

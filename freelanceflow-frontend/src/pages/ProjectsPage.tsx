@@ -30,18 +30,12 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import useProjectStore, { Project } from "@/store/projectStore";
+import useProjectStore, { type Project } from "@/store/projectStore";
+import ProjectForm, { formSchema } from "@/components/projects/ProjectForm";
 import useClientStore from "@/store/clientStore";
-import ProjectForm from "@/components/projects/ProjectForm";
-import TaskList from "@/components/projects/TaskList";
-import { ChevronRight } from "lucide-react";
 import * as z from "zod";
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  description: z.string().optional(),
-  clientId: z.string({ required_error: "Please select a client." }),
-});
+import { ChevronRight } from "lucide-react";
+import TaskList from "@/components/projects/TaskList";
 
 const ProjectsPage = () => {
   const { projects, addProject, updateProject, deleteProject } = useProjectStore();
@@ -63,7 +57,7 @@ const ProjectsPage = () => {
     if (editingProject) {
       updateProject({ ...editingProject, ...values, tasks: editingProject.tasks });
     } else {
-      addProject(values);
+      addProject({ ...values, createdAt: new Date(), createdBy: 'system', lastModifiedBy: 'system' });
     }
     handleCloseFormDialog();
   };

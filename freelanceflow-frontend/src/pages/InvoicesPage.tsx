@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import useInvoiceStore, { Invoice } from "@/store/invoiceStore";
+import useInvoiceStore, { type Invoice } from "@/store/invoiceStore";
 import useClientStore from "@/store/clientStore";
 import { Badge } from "@/components/ui/badge";
 import { PDFDownloadLink } from "@react-pdf/renderer";

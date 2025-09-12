@@ -14,12 +14,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useClientStore from "@/store/clientStore";
-import { Project } from "@/store/projectStore";
+import { type Project } from "@/store/projectStore";
+import { useTeamStore } from "@/store/teamStore";
+import { MultiSelect } from "@/components/ui/multi-select";
 
-const formSchema = z.object({
+
+export const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   description: z.string().optional(),
-  clientId: z.string({ required_error: "Please select a client." }),
+  clientId: z.string().min(1, { message: "Please select a client." }),
+  teamMembers: z.array(z.string()).optional(),
 });
 
 interface ProjectFormProps {
@@ -29,14 +33,19 @@ interface ProjectFormProps {
 
 const ProjectForm = ({ onSubmit, initialData }: ProjectFormProps) => {
   const { clients } = useClientStore();
+  const { members } = useTeamStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || { name: "", description: "", clientId: "" },
+    defaultValues: initialData || { 
+      name: "", 
+      description: "", 
+      clientId: "",
+      teamMembers: [],
+    },
   });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
@@ -87,8 +96,28 @@ const ProjectForm = ({ onSubmit, initialData }: ProjectFormProps) => {
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="teamMembers"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Team Members</FormLabel>
+              <FormControl>
+                <MultiSelect
+                  options={members.map(member => ({
+                    label: member.name || member.email,
+                    value: member.id
+                  }))}
+                  selected={field.value || []}
+                  onChange={field.onChange}
+                  placeholder="Select team members..."
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit">Save</Button>
-      </form>
     </Form>
   );
 };

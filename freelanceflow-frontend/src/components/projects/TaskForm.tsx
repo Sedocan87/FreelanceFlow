@@ -12,28 +12,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Task } from "@/store/projectStore";
+import { type Task } from "@/store/projectStore";
 
-const formSchema = z.object({
-  description: z.string().min(2, { message: "Description must be at least 2 characters." }),
-  hours: z.coerce.number().min(0, { message: "Hours must be a positive number." }),
-});
+import { formSchema } from "./task-form-schema";
+
+type TaskFormValues = z.infer<typeof formSchema>;
 
 interface TaskFormProps {
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  onSubmit: (values: TaskFormValues) => void;
   initialData?: Task;
 }
 
 const TaskForm = ({ onSubmit, initialData }: TaskFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<TaskFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData || { description: "", hours: 0 },
+    defaultValues: initialData || { description: "", hours: 0 } as TaskFormValues,
   });
 
+  const _onSubmit = form.handleSubmit(onSubmit);
+
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
+    <Form onSubmit={_onSubmit} className="space-y-4">
+        <FormField<TaskFormValues>
           control={form.control}
           name="description"
           render={({ field }) => (
@@ -46,21 +46,25 @@ const TaskForm = ({ onSubmit, initialData }: TaskFormProps) => {
             </FormItem>
           )}
         />
-        <FormField
+        <FormField<TaskFormValues>
           control={form.control}
           name="hours"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Hours</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="8" {...field} />
+                <Input
+                  type="number"
+                  placeholder="8"
+                  {...field}
+                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit">Save Task</Button>
-      </form>
     </Form>
   );
 };

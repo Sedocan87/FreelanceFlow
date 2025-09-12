@@ -6,14 +6,19 @@ export interface Task {
   id: string;
   description: string;
   hours: number;
+  completed: boolean;
 }
 
 export interface Project {
   id: string;
   name: string;
-  description: string;
+  description?: string;
   clientId: string;
   tasks: Task[];
+  teamMembers?: string[]; // Array of team member IDs
+  createdBy: string; // User ID of project creator
+  lastModifiedBy: string; // User ID of last person to modify the project
+  createdAt: Date;
 }
 
 interface ProjectState {
@@ -38,16 +43,24 @@ const useProjectStore = create<ProjectState>((set) => ({
       description: 'A complete overhaul of the main website.',
       clientId: initialClients.length > 0 ? initialClients[0].id : '',
       tasks: [
-        { id: uuidv4(), description: 'Design mockups', hours: 20 },
-        { id: uuidv4(), description: 'Develop homepage', hours: 35 },
-      ]
+        { id: uuidv4(), description: 'Design mockups', hours: 20, completed: true },
+        { id: uuidv4(), description: 'Develop homepage', hours: 35, completed: false },
+      ],
+      teamMembers: [],
+      createdBy: 'system',
+      lastModifiedBy: 'system',
+      createdAt: new Date(),
     },
     {
       id: uuidv4(),
       name: 'Mobile App Development',
       description: 'A new mobile app for iOS and Android.',
       clientId: initialClients.length > 1 ? initialClients[1].id : '',
-      tasks: []
+      tasks: [],
+      teamMembers: [],
+      createdBy: 'system',
+      lastModifiedBy: 'system',
+      createdAt: new Date()
     },
   ],
   addProject: (project) =>

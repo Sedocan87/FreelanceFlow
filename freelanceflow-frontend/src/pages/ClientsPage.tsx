@@ -25,15 +25,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import useClientStore, { Client } from "@/store/clientStore";
+import useClientStore, { type Client } from "@/store/clientStore";
+import { formSchema } from "@/components/clients/client-form-schema";
 import ClientForm from "@/components/clients/ClientForm";
 import GenerateInvoiceDialog from "@/components/invoices/GenerateInvoiceDialog";
 import * as z from "zod";
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-});
 
 const ClientsPage = () => {
   const { clients, addClient, updateClient, deleteClient } = useClientStore();
