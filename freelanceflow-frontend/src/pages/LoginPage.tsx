@@ -39,7 +39,7 @@ const LoginPage = () => {
           <CardDescription>Welcome back! Please login to your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <Form form={form} onSubmit={handleSubmit} className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
